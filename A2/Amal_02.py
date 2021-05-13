@@ -1,13 +1,12 @@
-#Provides a scripting component.
-""" Inputs:
+#Amal Algamdey_Assignment02
+
+
+"""Provides a scripting component.
+    Inputs:
         x: The x script variable
         y: The y script variable
     Output:
-        a: The a output variable
-        b: The b output variable
-        c: The c output variable
-        d: The d output variable
-"""
+        a: The a output variable"""
         
 import Rhino.Geometry as rg
 
@@ -15,57 +14,45 @@ import Rhino.Geometry as rg
 #compute face normals using rg.Mesh.FaceNormals.ComputeFaceNormals()
 #output the vectors to a
 
-a = []
-numberfaces =  len(m.Faces)
-for i in range(numberfaces):
-    normals = m.FaceNormals[i]
-    reversesn = rg.Vector3d.Negate(normals)
-    a.append(reversesn)
 
+m.FaceNormals.ComputeFaceNormals()      # m = input meshin GH
+m.Flip(m.FaceNormals, True, True, True) 
+a = m.FaceNormals
 
 #2.
 #get the centers of each faces using rg.Mesh.Faces.GetFaceCenter()
 #store the centers into a list called centers 
 #output that list to b
 
-b = []
-for i in range(numberfaces):
-    face = m.Faces.GetFaceCenter(i)
-    b.append(face)
-
-
-#b = centers
+face_centers = [m.Faces.GetFaceCenter(i) for i in xrange(m.Faces.Count)]
+b = face_centers
 
 #3.
 #calculate the angle between the sun and each FaceNormal using rg.Vector3d.VectorAngle()
 #store the angles in a list called angleList and output it to c
 
-#c = angleList
+angleList = []
+for i in a:
+    angle = rg.Vector3d.VectorAngle(s,i) 
+    angleList.append(angle)
 
-c = []
-for i in range(numberfaces):
-    angle = rg.Vector3d.VectorAngle(a[i],s)
-    c.append(angle)
-
+c = angleList
 
 #4. explode the mesh - convert each face of the mesh into a mesh
 #for this, you have to first copy the mesh using rg.Mesh.Duplicate()
 #then iterate through each face of the copy, extract it using rg.Mesh.ExtractFaces
 #and store the result into a list called exploded in output d
 
-#d = explodedmesh
+meshDup = rg.Mesh.Duplicate(m)
+meshDup_faces = meshDup.Faces.Count
 
-explodedmesh = []
-novo = len(rg.Mesh.Duplicate(m).Faces)
-m_novo = m.Duplicate()
-for i in range(novo):
-    face_mesh = m_novo.Faces.ExtractFaces([0])
-    explodedmesh.append(face_mesh)
+exploded = []
+for i in range (meshDup_faces):
+    extMesh = meshDup.Faces.ExtractFaces([0])
+    exploded.append(extMesh)
 
-d = explodedmesh
+d = exploded
 
-f = novo
-
-#after here, your task is to apply a transformation to each face of the mesh
+##after here, your task is to apply a transformation to each face of the mesh
 #the transformation should correspond to the angle value that corresponds that face to it... 
 #the result should be a mesh that responds to the sun position... its up to you!
